@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Desde aquel día...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Fredoka+One&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <audio id="bg-music" loop src="Rosas.mp3"></audio>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #2b081e;
+            color: #fff;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* App Container mimicking mobile viewport */
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            background: linear-gradient(180deg, #ff9bb2 0%, #ff6b8b 35%, #e6396f 70%, #d81b60 100%);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            scroll-behavior: smooth;
+        }
+
+        @media (min-width: 440px) {
+            .app-container {
+                height: 90vh;
+                border-radius: 40px;
+                border: 8px solid #ffb6c1;
+            }
+        }
+
+        /* Floating background texts */
+        .floating-text {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.25);
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 1;
+            animation: floatText 12s infinite linear;
+        }
+
+        @keyframes floatText {
+            0% { transform: translateY(100vh) rotate(-5deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(5deg); opacity: 0; }
+        }
+
+        /* Floating hearts canvas */
+        #hearts-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* LOCK SCREEN STYLES */
+        #lock-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: radial-gradient(circle at center, #ffa4c4 0%, #ff5288 60%, #d81b60 100%);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        #lock-screen.unlocked {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        /* REDESIGNED REALISTIC 3D SVG HEART LOCK */
+        .heart-lock-3d-wrapper {
+            position: relative;
+            width: 320px;
+            height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            filter: drop-shadow(0 20px 30px rgba(160, 10, 60, 0.5));
+        }
+
+        .svg-heart-lock {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .shackle-animated {
+            transform-origin: 160px 120px;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .shackle-animated.unlocked-shackle {
+            transform: translateY(-28px) rotate(-12deg);
+        }
+
+        /* Wheels dial content aligned perfectly inside SVG heart */
+        .wheels-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 230, 240, 0.25) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px 14px;
+            border-radius: 28px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.8), 0 10px 25px rgba(180, 20, 70, 0.35);
+            margin-top: 50px;
+        }
+
+        .wheel-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wheel-btn {
+            background: linear-gradient(180deg, #ffffff 0%, #ffedf3 100%);
+            color: #e6005c;
+            width: 34px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            box-shadow: 0 4px 8px rgba(180, 20, 70, 0.25), inset 0 2px 2px #fff;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        .wheel-btn:active {
+            transform: scale(0.85);
+            background: #ff2a70;
+            color: #fff;
+        }
+
+        .wheel-display {
+            width: 44px;
+            height: 46px;
+            background: linear-gradient(180deg, #ffffff 0%, #fff5f8 100%);
+            color: #d81b60;
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            margin: 5px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 4px 10px rgba(0,0,0,0.1);
+            font-family: 'Fredoka One', cursive;
+            border: 1.5px solid #ffccd8;
+        }
+
+        /* MAIN CONTENT STYLES */
+        #main-content {
+            position: relative;
+            z-index: 10;
+            padding: 24px 18px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-card {
+            background: rgba(106, 17, 72, 0.35);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 28px;
+            padding: 20px 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-family: 'Fredoka One', cursive;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(216, 27, 96, 0.8);
+            text-align: center;
+            font-size: 1.65rem;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 3D ROTATING CAROUSEL */
+        .carousel-3d-stage {
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: pan-y;
+        }
+
+        .carousel-3d-spinner {
+            width: 140px;
+            height: 180px;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .carousel-3d-card {
+            position: absolute;
+            width: 140px;
+            height: 180px;
+            left: 0;
+            top: 0;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 4px solid #ffffff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+            background-color: #ffb6c1;
+            backface-visibility: visible;
+        }
+
+        .carousel-3d-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* TIME COUNTER STYLES */
+        .couple-photo-wrapper {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 50%;
+            padding: 6px;
+            background: linear-gradient(135deg, #ffffff, #ff69b4, #ffffff);
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.8);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(255, 105, 180, 1), 0 0 50px rgba(255, 192, 203, 0.8); }
+        }
+
+        .couple-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+        }
+
+        .counter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .counter-box {
+            background: rgba(255, 255, 255, 0.92);
+            color: #d81b60;
+            border-radius: 18px;
+            padding: 10px 6px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+        }
+
+        .counter-number {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .counter-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #ad1457;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* LETTER ENVELOPE STYLES */
+        .envelope-wrapper {
+            position: relative;
+            width: 180px;
+            height: 120px;
+            background: #ff758c;
+            margin: 20px auto 10px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 90px solid transparent;
+            border-right: 90px solid transparent;
+            border-top: 65px solid #ff4971;
+            transform-origin: top;
+            transition: transform 0.4s ease;
+            z-index: 3;
+        }
+
+        .envelope-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 90px solid #ff5e82;
+            border-right: 90px solid #ff5e82;
+            border-bottom: 60px solid #ff3a64;
+            border-top: 60px solid transparent;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 2;
+        }
+
+        .envelope-heart {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #d81b60;
+            font-size: 28px;
+            z-index: 4;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            animation: heartBeat 1.5s infinite;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.18); }
+        }
+
+        /* MODAL CARTA */
+        #letter-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        #letter-modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .letter-paper {
+            background: #fff0f5;
+            color: #4a0e2e;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 24px;
+            padding: 28px 22px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transform: translateY(30px) scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #ffb6c1;
+        }
+
+        #letter-modal.open .letter-paper {
+            transform: translateY(0) scale(1);
+        }
+
+        .letter-paper h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: #d81b60;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .letter-paper p {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #5c1d3d;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            background: #ff4081;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Mobile Container -->
+    <div class="app-container" id="appContainer">
+
+        <!-- Floating Particles Canvas -->
+        <canvas id="hearts-canvas"></canvas>
+
+        <!-- Floating Romantic Background Texts -->
+        <div class="floating-text" style="left: 10%; animation-delay: 0s;">Tú haces mi mundo brillar 💖</div>
+        <div class="floating-text" style="left: 55%; animation-delay: 3s;">Eres mi sueño 🌙</div>
+        <div class="floating-text" style="left: 20%; animation-delay: 6s;">Juntos por siempre 🌹</div>
+        <div class="floating-text" style="left: 60%; animation-delay: 9s;">Mi corazón es tuyo ✨</div>
+
+        <!-- 1. PANTALLA DE BLOQUEO DE CANDADO -->
+        <div id="lock-screen">
+            <h2 class="font-bold text-2xl text-white text-center drop-shadow-md mb-1" style="font-family: 'Fredoka One', cursive;">
+                Ingresa la fecha correcta...
+            </h2>
+
+            <div class="heart-lock-3d-wrapper">
+                <!-- SVG Realistic 3D Heart Lock -->
+                <svg class="svg-heart-lock" viewBox="0 0 320 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Metallic Shackle Gradients -->
+                        <linearGradient id="shackleGrad" x1="80" y1="20" x2="240" y2="160" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="25%" stop-color="#ffb3cb"/>
+                            <stop offset="50%" stop-color="#ff5e8c"/>
+                            <stop offset="75%" stop-color="#b81242"/>
+                            <stop offset="100%" stop-color="#fff0f5"/>
+                        </linearGradient>
+                        
+                        <!-- Heart Body 3D Metallic Glossy Gradient -->
+                        <radialGradient id="heartBodyGrad" cx="35%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#ff9ebb"/>
+                            <stop offset="35%" stop-color="#ff3b77"/>
+                            <stop offset="75%" stop-color="#d80048"/>
+                            <stop offset="100%" stop-color="#800026"/>
+                        </radialGradient>
+
+                        <!-- Highlights & Rim Lights -->
+                        <linearGradient id="glossGrad" x1="160" y1="100" x2="160" y2="280" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+                            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05"/>
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0.25"/>
+                        </linearGradient>
+
+                        <filter id="shadow3d" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#700020" flood-opacity="0.5"/>
+                        </filter>
+                    </defs>
+
+                    <!-- Animated Metallic Shackle -->
+                    <g id="shackleGroup" class="shackle-animated">
+                        <path d="M 105 150 V 90 A 55 55 0 0 1 215 90 V 150" 
+                              stroke="url(#shackleGrad)" 
+                              stroke-width="26" 
+                              stroke-linecap="round" 
+                              fill="none"/>
+                        <!-- Inner Shackle Highlight -->
+                        <path d="M 105 150 V 90 A 55 55 0 0 1 215 90 V 150" 
+                              stroke="#ffffff" 
+                              stroke-width="4" 
+                              stroke-linecap="round" 
+                              fill="none" 
+                              opacity="0.6"
+                              transform="translate(-2, -2)"/>
+                    </g>
+
+                    <!-- Main Heart Lock Body -->
+                    <path filter="url(#shadow3d)" 
+                          d="M 160 300 
+                             C 20 210, 10 130, 85 105 
+                             C 130 90, 155 115, 160 125 
+                             C 165 115, 190 90, 235 105 
+                             C 310 130, 300 210, 160 300 Z" 
+                          fill="url(#heartBodyGrad)"/>
+
+                    <!-- Glossy Reflection Overlay -->
+                    <path d="M 160 300 
+                             C 20 210, 10 130, 85 105 
+                             C 130 90, 155 115, 160 125 
+                             C 165 115, 190 90, 235 105 
+                             C 310 130, 300 210, 160 300 Z" 
+                          fill="url(#glossGrad)"/>
+
+                    <!-- Inner Bezel Ring -->
+                    <path d="M 160 288 
+                             C 30 202, 22 135, 88 112 
+                             C 128 98, 152 120, 160 128 
+                             C 168 120, 192 98, 232 112 
+                             C 298 135, 290 202, 160 288 Z" 
+                          fill="none" 
+                          stroke="#ffffff" 
+                          stroke-width="2" 
+                          opacity="0.4"/>
+                </svg>
+
+                <!-- Wheels Dial Container -->
+                <div class="wheels-container">
+                    <!-- Rueda 1: Día -->
+                    <div class="wheel-col">
+                        <button class="wheel-btn" onclick="adjustWheel(0, 1)"><i class="fa-solid fa-chevron-up"></i></button>
+                        <div class="wheel-display" id="w-0">01</div>
+                        <button class="wheel-btn" onclick="adjustWheel(0, -1)"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <!-- Rueda 2: Mes -->
+                    <div class="wheel-col">
+                        <button class="wheel-btn" onclick="adjustWheel(1, 1)"><i class="fa-solid fa-chevron-up"></i></button>
+                        <div class="wheel-display" id="w-1">01</div>
+                        <button class="wheel-btn" onclick="adjustWheel(1, -1)"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <!-- Rueda 3: Año -->
+                    <div class="wheel-col">
+                        <button class="wheel-btn" onclick="adjustWheel(2, 1)"><i class="fa-solid fa-chevron-up"></i></button>
+                        <div class="wheel-display" id="w-2">25</div>
+                        <button class="wheel-btn" onclick="adjustWheel(2, -1)"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-white text-xs font-semibold tracking-wide text-center bg-black/20 px-4 py-2 rounded-full backdrop-blur-md mt-2 shadow-sm border border-white/20">
+                Pista: La fecha en que nos conocimos 💕
+            </p>
+        </div>
+
+        <!-- APP CONTENT (Unlocked) -->
+        <div id="main-content">
+
+            <!-- 2. TITULO PRINCIPAL -->
+            <div class="text-center pt-2">
+                <h1 class="text-3xl font-extrabold text-white drop-shadow-lg tracking-wide" style="font-family: 'Fredoka One', cursive;">
+                    Desde aquel día... 💕✨
+                </h1>
+            </div>
+
+            <!-- 3. NUESTROS RECUERDOS (3D Carousel) -->
+            <div class="section-card">
+                <h2 class="section-title">Nuestros Recuerdos</h2>
+                <div class="carousel-3d-stage" id="carouselStage">
+                    <div class="carousel-3d-spinner" id="carouselSpinner">
+                        <!-- Cards added via JavaScript -->
+                    </div>
+                </div>
+                <p class="text-center text-xs text-white/75 mt-3"><i class="fa-solid fa-hand-pointer mr-1"></i> Desliza para rotar los recuerdos</p>
+            </div>
+
+            <!-- 4. NUESTRO TIEMPO JUNTOS (Counter) -->
+            <div class="section-card">
+                <h2 class="section-title">Nuestro Tiempo Juntos</h2>
+
+                <div class="couple-photo-wrapper">
+                    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500&auto=format&fit=crop&q=80" alt="Pareja" class="couple-photo">
+                </div>
+
+                <div class="counter-grid">
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-years">0</div>
+                        <div class="counter-label">Años</div>
+                    </div>
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-months">0</div>
+                        <div class="counter-label">Meses</div>
+                    </div>
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-days">0</div>
+                        <div class="counter-label">Días</div>
+                    </div>
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-hours">0</div>
+                        <div class="counter-label">Horas</div>
+                    </div>
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-minutes">0</div>
+                        <div class="counter-label">Minutos</div>
+                    </div>
+                    <div class="counter-box">
+                        <div class="counter-number" id="c-seconds">0</div>
+                        <div class="counter-label">Segundos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. CARTA DE MI CORAZÓN -->
+            <div class="section-card text-center">
+                <h2 class="section-title">Carta de Mi Corazón</h2>
+                <div class="envelope-wrapper" onclick="openLetterModal()">
+                    <div class="envelope-flap" id="envFlap"></div>
+                    <div class="envelope-pocket"></div>
+                    <div class="envelope-heart"><i class="fa-solid fa-heart"></i></div>
+                </div>
+                <p class="text-xs text-white/80 mt-3">Haz clic en el sobre para abrir 💌</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 6. MODAL CARTA -->
+    <div id="letter-modal">
+        <div class="letter-paper">
+            <button class="close-modal-btn" onclick="closeLetterModal()">✕</button>
+            <h3>Contigo todo es perfecto 💕</h3>
+            <p>
+                Mi amor, desde el primer día que te vi, supe que eras mi lugar seguro. Cada risa compartida, cada mirada y cada abrazo a tu lado se han convertido en los tesoros más valiosos de mi vida.
+            </p>
+            <p>
+                Eres mi sol en los días nublados, mi refugio constante y mi motivo favorito para sonreír. No existen palabras suficientes para expresar cuánto te amo.
+            </p>
+            <p class="font-bold text-right text-pink-600 mt-4" style="font-family: 'Dancing Script', cursive; font-size: 1.5rem;">
+                Por siempre juntos, mi vida ❤️
+            </p>
+        </div>
+    </div>
+
+<script>
+        /* CONFIGURACIÓN Y CLAVE DE ACCESO */
+        const TARGET_DATE = { day: 26, month: 6, year: 23 };
+        const RELATION_START_DATE = new Date(2023, 5, 26, 0, 0, 0); 
+
+        let currentWheelState = [1, 1, 25];
+
+        // 1. LÓGICA DEL CANDADO
+        function adjustWheel(index, amount) {
+            if (index === 0) { 
+                currentWheelState[0] += amount;
+                if (currentWheelState[0] > 31) currentWheelState[0] = 1;
+                if (currentWheelState[0] < 1) currentWheelState[0] = 31;
+            } else if (index === 1) { 
+                currentWheelState[1] += amount;
+                if (currentWheelState[1] > 12) currentWheelState[1] = 1;
+                if (currentWheelState[1] < 1) currentWheelState[1] = 12;
+            } else if (index === 2) { 
+                currentWheelState[2] += amount;
+                if (currentWheelState[2] > 99) currentWheelState[2] = 0;
+                if (currentWheelState[2] < 0) currentWheelState[2] = 99;
+            }
+
+            document.getElementById(`w-${index}`).innerText = String(currentWheelState[index]).padStart(2, '0');
+            checkUnlockCode();
+        }
+
+        function checkUnlockCode() {
+            if (
+                currentWheelState[0] === TARGET_DATE.day &&
+                currentWheelState[1] === TARGET_DATE.month &&
+                currentWheelState[2] === TARGET_DATE.year
+            ) {
+                // <-- AQUÍ ESTABA FALTANDO: Reproducir la música al acertar la fecha -->
+                const music = document.getElementById('bg-music');
+                if (music) {
+                    music.play().catch(error => {
+                        console.log("El navegador restringió la reproducción automática:", error);
+                    });
+                }
+
+                // Animación de apertura del candado
+                document.getElementById('shackleGroup').classList.add('unlocked-shackle');
+                
+                setTimeout(() => {
+                    const lockScreen = document.getElementById('lock-screen');
+                    const mainContent = document.getElementById('main-content');
+
+                    lockScreen.classList.add('unlocked');
+                    mainContent.classList.add('visible');
+
+                    startLiveCounter();
+                }, 600);
+            }
+        }
+
+        // 2. CARRUSEL 3D ROTATIVO CON PERSPECTIVA
+        const memoryImages = [
+            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=500&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=500&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=500&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=500&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'
+        ];
+
+        let carouselRotation = 0;
+        let isDragging = false;
+        let startX = 0;
+        let currentRotationOffset = 0;
+
+        function setup3DCarousel() {
+            const spinner = document.getElementById('carouselSpinner');
+            const totalCards = memoryImages.length;
+            const radius = 170; 
+
+            memoryImages.forEach((imgUrl, idx) => {
+                const card = document.createElement('div');
+                card.className = 'carousel-3d-card';
+                
+                const angle = (idx / totalCards) * 360;
+                card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = `Recuerdo ${idx + 1}`;
+                card.appendChild(img);
+
+                spinner.appendChild(card);
+            });
+
+            setInterval(() => {
+                if (!isDragging) {
+                    carouselRotation -= 0.4;
+                    spinner.style.transform = `rotateY(${carouselRotation}deg)`;
+                }
+            }, 30);
+
+            const stage = document.getElementById('carouselStage');
+
+            const handleStart = (clientX) => {
+                isDragging = true;
+                startX = clientX;
+                currentRotationOffset = carouselRotation;
+            };
+
+            const handleMove = (clientX) => {
+                if (!isDragging) return;
+                const deltaX = clientX - startX;
+                carouselRotation = currentRotationOffset + deltaX * 0.5;
+                spinner.style.transform = `rotateY(${carouselRotation}deg)`;
+            };
+
+            const handleEnd = () => {
+                isDragging = false;
+            };
+
+            stage.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX));
+            stage.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX));
+            stage.addEventListener('touchend', handleEnd);
+
+            stage.addEventListener('mousedown', (e) => handleStart(e.clientX));
+            window.addEventListener('mousemove', (e) => handleMove(e.clientX));
+            window.addEventListener('mouseup', handleEnd);
+        }
+
+        // 3. CONTADOR DE TIEMPO EN VIVO
+        function startLiveCounter() {
+            function update() {
+                const now = new Date();
+                const diff = now - RELATION_START_DATE;
+
+                const seconds = Math.floor((diff / 1000) % 60);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                
+                const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const years = Math.floor(totalDays / 365.25);
+                const months = Math.floor((totalDays % 365.25) / 30.4375);
+                const days = Math.floor((totalDays % 365.25) % 30.4375);
+
+                document.getElementById('c-years').innerText = years;
+                document.getElementById('c-months').innerText = months;
+                document.getElementById('c-days').innerText = days;
+                document.getElementById('c-hours').innerText = hours;
+                document.getElementById('c-minutes').innerText = minutes;
+                document.getElementById('c-seconds').innerText = seconds;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        // 4. MODAL DE CARTA
+        function openLetterModal() {
+            document.getElementById('letter-modal').classList.add('open');
+            document.getElementById('envFlap').style.transform = 'rotateX(180deg)';
+        }
+
+        function closeLetterModal() {
+            document.getElementById('letter-modal').classList.remove('open');
+            document.getElementById('envFlap').style.transform = 'rotateX(0deg)';
+        }
+
+        // Inicializar carrusel al cargar la página
+        window.onload = function() {
+            setup3DCarousel();
+        };
+    </script>
+</body>
+</html>
